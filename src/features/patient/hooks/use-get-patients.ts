@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import { client } from '@/lib/api-client'
 import type { PatientQueryParams } from '@/lib/api-types'
 import { DetailedError, parseResponse } from 'hono/client'
+import { client } from '@/lib/api-client'
 
 export const useGetPatients = (params?: Partial<PatientQueryParams>) => {
   return useQuery({
@@ -24,12 +24,10 @@ export const useGetPatients = (params?: Partial<PatientQueryParams>) => {
   })
 }
 
-const getPatientById = client.patient[':id'].$get
-
 export const useGetPatient = (patientId: string) => {
   return useQuery({
     queryFn: async () => {
-      const res = await parseResponse(getPatientById({
+      const res = await parseResponse(client.patient[':id'].$get({
         param: { id: patientId },
       })).catch((error: DetailedError) => {
         throw new Error(`Failed to fetch patient: ${error.message}`)
