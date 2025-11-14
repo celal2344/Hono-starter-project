@@ -1,5 +1,10 @@
 {
   "include": ["**/*.ts", "**/*.tsx"],
+  "references": [
+    {
+      "path": "../backend"
+    }
+  ],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
@@ -7,6 +12,7 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["vite/client"],
 
+    
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -23,6 +29,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
+      "@api/*": ["../backend/src/*"]
     }
   }
 }
