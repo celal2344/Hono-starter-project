@@ -9,4 +9,4 @@ RUN pnpm install
 RUN pnpm run build
 
 EXPOSE 3001
-CMD sh -c "node dist/src/scripts/seed-patients.js || true && pnpm start" # seed the database and start the server
+CMD sh -c "node dist/src/scripts/seed-patients.js || true && node dist/src/index.js & sleep 3 && node dist/src/scripts/create-initial-users.js || true && wait"

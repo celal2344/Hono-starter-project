@@ -21,6 +21,9 @@ export const auth = betterAuth({
         maxPasswordLength: 128,
         autoSignIn: true,
     },
+    session: {
+        expiresIn: 60 * 60 * 24, // 1 day
+    },
     trustedOrigins: [env.FRONTEND_URL],
     socialProviders: {},
     plugins: [
