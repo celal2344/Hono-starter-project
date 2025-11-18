@@ -4,7 +4,6 @@ import { authClient } from '@/lib/auth-client'
 
 export const Route = createFileRoute('/')({
   beforeLoad: async ({ location }) => {
-    // Skip auth check during build/SSR
     if (typeof window === 'undefined') {
       return
     }
@@ -31,6 +30,7 @@ function App() {
           <h2 className="text-2xl font-bold text-gray-900">Patient Management</h2>
           <p className="text-sm text-gray-600 mt-1">View and manage patient records</p>
         </div>
+        
         <DataGridDemo />
       </div>
     </div>

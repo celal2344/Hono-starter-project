@@ -6,7 +6,6 @@ import { client } from '@/lib/api-client'
 export const useGetPatients = (params?: Partial<PatientQueryParams>) => {
   return useQuery({
     queryFn: async () => {
-      console.log(params)
         const data = await parseResponse(client.patient.$get({
           query: {
             page: params?.page,
@@ -21,8 +20,7 @@ export const useGetPatients = (params?: Partial<PatientQueryParams>) => {
         return data
     },
     queryKey: ['patients', params?.page, params?.size, params?.sortBy, params?.order, params?.filters],
-    refetchOnWindowFocus: false,
-    gcTime: 0,
-    staleTime: 0,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30, 
   })
 }

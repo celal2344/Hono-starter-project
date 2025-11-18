@@ -7,7 +7,7 @@ import { Activity, LogOut, User } from 'lucide-react'
 export default function Header() {
   const navigate = useNavigate()
   const { data: session } = authClient.useSession()
-  console.log(session?.session)
+  
   const handleLogout = async () => {
     try {
       await authClient.signOut({

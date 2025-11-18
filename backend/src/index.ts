@@ -13,13 +13,12 @@ import { databaseConnection } from './utils/mongodb/mongo.js';
 
 export type HonoEnv = {
   Variables: {
-    user: any;
-    session: any;
+    user: typeof auth.$Infer.Session.user | null
+    session: typeof auth.$Infer.Session.session | null
   };
 };
 
 export const app = new OpenAPIHono<HonoEnv>()
-  // Global Middlewares
   .use(prettyJSON())
   .use(
     "*",
@@ -87,9 +86,7 @@ serve(
     fetch: app.fetch,
     port: env.PORT,
   },
-  (info) => {
-    logger.info({ module: "server" }, `🚀 Server is running on http://localhost:${info.port}`);
-    logger.info({ module: "server" }, `📚 API Documentation available at http://localhost:${info.port}/docs`);
-    logger.info({ module: "server" }, `🔐 Auth Documentation available at http://localhost:${info.port}/auth/reference`);
+  () => {
+    logger.info({ module: "server" }, `🚀 Server is running`);
   }
 );
