@@ -1,7 +1,7 @@
 "use no memo" 
 
 import * as React from 'react';
-import { CSSProperties, Fragment, ReactNode, useMemo } from 'react';
+import { CSSProperties, Fragment, ReactNode } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useDataGrid } from '@/components/ui/data-grid';
 import { Cell, Column, flexRender, Header, HeaderGroup, Row } from '@tanstack/react-table';

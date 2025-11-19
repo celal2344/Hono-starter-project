@@ -35,10 +35,12 @@ export default function PatientsDataGrid() {
     pagination,
     sorting,
     columnSizing,
+    columnPinning,
     filters,
     setPagination,
     setSorting,
     setColumnSizing,
+    setColumnPinning,
     setFilters,
   } = useDatatableStore();
   
@@ -74,6 +76,7 @@ export default function PatientsDataGrid() {
       pagination,
       sorting,
       columnSizing,
+      columnPinning,
     },
     defaultColumn: {
       size: 200, 
@@ -82,6 +85,7 @@ export default function PatientsDataGrid() {
     },
     columnResizeMode: 'onChange',
     onColumnSizingChange: setColumnSizing,
+    onColumnPinningChange: setColumnPinning,
     manualPagination: true,
     manualSorting: true,
     onPaginationChange: setPagination,
