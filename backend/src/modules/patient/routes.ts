@@ -1,3 +1,4 @@
+import { requireDoctor } from "@/middlewares/auth.js";
 import { createPatientSchema, patientSchema, updatePatientRequestSchema } from "@/modules/patient/schemas/patient.js";
 import { queryParamsSchema } from "@/utils/schemas/request.js";
 import { ErrorSchema, paginatedResponseSchema, successResponseSchema } from "@/utils/schemas/response.js";
@@ -156,6 +157,7 @@ export const updatePatientRoute = createRoute({
         },
     },
     middleware: [
+        requireDoctor,
         zValidator("json", updatePatientRequestSchema, (result, c) => {
             if (!result.success) {
                 const errors = result.error.issues.map((issue) => ({
@@ -216,6 +218,9 @@ export const cancelPatientRoute = createRoute({
             id: z.string().min(1).openapi({ example: '507f1f77bcf86cd799439011', description: 'Patient ID' })
         })
     },
+    middleware: [
+        requireDoctor,
+    ],
     responses: {
         200: {
             content: {

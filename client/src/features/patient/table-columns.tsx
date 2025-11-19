@@ -2,6 +2,7 @@ import { DataGridColumnHeader } from '@/components/ui/data-grid-column-header'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { ColumnDef } from '@tanstack/react-table';
 import { Patient } from '@/lib/api-types';
+import { Link } from '@tanstack/react-router';
 
 export const columns: ColumnDef<Patient>[] = [
       {
@@ -11,7 +12,11 @@ export const columns: ColumnDef<Patient>[] = [
         cell: ({ row }) => {
           const initials = `${row.original.name[0]}${row.original.surname[0]}`.toUpperCase();
           return (
-            <div className="flex items-center gap-3">
+            <Link
+              to="/patients/$patientId"
+              params={{ patientId: row.original._id || '' }}
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            >
               <Avatar className="size-8">
                 <AvatarFallback>{initials}</AvatarFallback>
               </Avatar>
@@ -19,7 +24,7 @@ export const columns: ColumnDef<Patient>[] = [
                 <div className="font-medium text-foreground">{row.original.name}</div>
                 <div className="text-muted-foreground">{row.original.surname}</div>
               </div>
-            </div>
+            </Link>
           );
         },
         meta: {

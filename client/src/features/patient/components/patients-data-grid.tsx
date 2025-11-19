@@ -27,7 +27,7 @@ import { Filters, type Filter } from '@/components/ui/filters';
 import { convertFiltersToMongo } from '../utils/filters-to-mongo';
 import { columns } from '../table-columns';
 import { filterFields } from '../utils/filter-fields';
-import { useDatatableStore } from '@/stores/datatable-store';
+import { useDatatableStore } from '@/features/patient/stores/datatable-store';
 
 
 export default function PatientsDataGrid() {

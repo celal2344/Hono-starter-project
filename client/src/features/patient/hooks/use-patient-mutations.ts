@@ -70,19 +70,64 @@ export const useUpdatePatient = () => {
 
   return useMutation({
     mutationFn: async ({
-      patientId: _patientId,
-      patientData: _patientData,
+      patientId,
+      patientData,
     }: {
       patientId: string
       patientData: Partial<PatientFormData>
     }) => {
-      // TODO: Implement when backend endpoint is available
-      throw new Error('Update patient endpoint not implemented yet')
+      const payload: Record<string, any> = {}
+      
+      if (patientData.firstName !== undefined) payload.name = patientData.firstName
+      if (patientData.lastName !== undefined) payload.surname = patientData.lastName
+      if (patientData.gender !== undefined) payload.gender = patientData.gender
+      if (patientData.birthdate !== undefined) payload.birthDate = patientData.birthdate
+      if (patientData.identifier !== undefined) payload.identifier = patientData.identifier
+      if (patientData.country !== undefined) payload.country = patientData.country
+      if (patientData.ethnicity !== undefined) payload.ethnicity = patientData.ethnicity
+      if (patientData.companionInfo !== undefined) payload.companionInfo = patientData.companionInfo
+
+      const res = await client.patient[':id'].$patch({
+        param: { id: patientId },
+        json: payload,
+      })
+      
+      if (!res.ok) {
+        const error = await res.text()
+        throw new Error(error || 'Failed to update patient')
+      }
+      
+      return await res.json()
     },
     onSuccess: (_, variables) => {
       queryClient.refetchQueries({ queryKey: ['patients'] })
       queryClient.invalidateQueries({
         queryKey: ['patients', 'detail', variables.patientId],
+      })
+    },
+  })
+}
+
+export const useCancelPatient = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (patientId: string) => {
+      const res = await client.patient[':id']['cancel'].$post({
+        param: { id: patientId },
+      })
+      
+      if (!res.ok) {
+        const error = await res.text()
+        throw new Error(error || 'Failed to cancel patient')
+      }
+      
+      return await res.json()
+    },
+    onSuccess: (_, patientId) => {
+      queryClient.refetchQueries({ queryKey: ['patients'] })
+      queryClient.invalidateQueries({
+        queryKey: ['patients', 'detail', patientId],
       })
     },
   })

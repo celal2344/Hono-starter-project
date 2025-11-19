@@ -3,8 +3,46 @@ import { auth } from '../utils/auth/auth.js';
 import { logger } from '../utils/logger.js';
 import { databaseConnection, getPatientCollection } from '../utils/mongodb/mongo.js';
 
-// Generate unique identifiers using timestamp
-const timestamp = Date.now();
+// Helper function to generate Turkish ID (TC Kimlik No)
+function generateTurkishID(): string {
+    // First 9 digits: first digit cannot be 0
+    const first9 = Math.floor(Math.random() * 900000000) + 100000000;
+    const first9Str = first9.toString();
+    const digits = first9Str.split('').map(d => parseInt(d, 10));
+    
+    // Calculate 10th digit (checksum): weighted sum of first 9 digits mod 10
+    // Formula: (1×d1 + 2×d2 + 3×d3 + 4×d4 + 5×d5 + 6×d6 + 7×d7 + 8×d8 + 9×d9) mod 10
+    const weightedSum = digits.reduce((sum, digit, index) => sum + (digit * (index + 1)), 0);
+    const digit10 = weightedSum % 10;
+    
+    // Calculate 11th digit (checksum): weighted sum of first 10 digits mod 10
+    // Formula: (1×d1 + 2×d2 + ... + 9×d9 + 10×d10) mod 10
+    const weightedSum10 = weightedSum + (digit10 * 10);
+    const digit11 = weightedSum10 % 10;
+    
+    return first9Str + digit10.toString() + digit11.toString();
+}
+
+// Helper function to generate passport number
+function generatePassportNumber(seed: number): string {
+    // Generate a random alphanumeric passport number
+    const chars = 'ABCDEFGHJKLMNPRSTUVWXYZ0123456789';
+    const length = 8 + (seed % 3); // 8-10 characters
+    let passport = '';
+    for (let i = 0; i < length; i++) {
+        passport += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return passport;
+}
+
+// Generate identifiers: mix of Turkish ID and passport numbers
+function generateIdentifier(index: number, useTurkishID: boolean): string {
+    if (useTurkishID) {
+        return generateTurkishID();
+    } else {
+        return generatePassportNumber(index);
+    }
+}
 
 const mockPatients: CreatePatient[] = [
     {
@@ -12,7 +50,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Doe",
         gender: "male",
         birthDate: 19900101,
-        identifier: `ID${timestamp}-001`,
+        identifier: generateIdentifier(1, true), // Turkish ID
         country: "USA",
         ethnicity: "Caucasian",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -29,7 +67,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Garcia",
         gender: "female",
         birthDate: 19850515,
-        identifier: `ID${timestamp}-002`,
+        identifier: generateIdentifier(2, false), // Passport
         country: "Spain",
         ethnicity: "Hispanic",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -46,7 +84,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Hassan",
         gender: "male",
         birthDate: 19920720,
-        identifier: `ID${timestamp}-003`,
+        identifier: generateIdentifier(3, true), // Turkish ID
         country: "Egypt",
         ethnicity: "Middle Eastern",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -56,7 +94,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Tanaka",
         gender: "female",
         birthDate: 19880310,
-        identifier: `ID${timestamp}-004`,
+        identifier: generateIdentifier(4, false), // Passport
         country: "Japan",
         ethnicity: "Asian",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -78,7 +116,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Johnson",
         gender: "male",
         birthDate: 19951205,
-        identifier: `ID${timestamp}-005`,
+        identifier: generateIdentifier(5, true), // Turkish ID
         country: "Canada",
         ethnicity: "African American",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -88,7 +126,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Wilson",
         gender: "female",
         birthDate: 19870822,
-        identifier: `ID${timestamp}-006`,
+        identifier: generateIdentifier(6, false), // Passport
         country: "United Kingdom",
         ethnicity: "Caucasian",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -105,7 +143,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Sharma",
         gender: "female",
         birthDate: 19930614,
-        identifier: `ID${timestamp}-007`,
+        identifier: generateIdentifier(7, true), // Turkish ID
         country: "India",
         ethnicity: "South Asian",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -115,7 +153,7 @@ const mockPatients: CreatePatient[] = [
         surname: "O'Brien",
         gender: "male",
         birthDate: 19820928,
-        identifier: `ID${timestamp}-008`,
+        identifier: generateIdentifier(8, false), // Passport
         country: "Ireland",
         ethnicity: "Caucasian",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -132,7 +170,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Chen",
         gender: "other",
         birthDate: 19981103,
-        identifier: `ID${timestamp}-009`,
+        identifier: generateIdentifier(9, true), // Turkish ID
         country: "China",
         ethnicity: "Asian",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -142,7 +180,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Rossi",
         gender: "female",
         birthDate: 19910418,
-        identifier: `ID${timestamp}-010`,
+        identifier: generateIdentifier(10, false), // Passport
         country: "Italy",
         ethnicity: "Mediterranean",
         documentState: { isCanceled: true, cancelledAt: null },
@@ -159,7 +197,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Volkov",
         gender: "male",
         birthDate: 19890225,
-        identifier: `ID${timestamp}-011`,
+        identifier: generateIdentifier(11, true), // Turkish ID
         country: "Russia",
         ethnicity: "Slavic",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -176,7 +214,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Al-Rahman",
         gender: "female",
         birthDate: 19940707,
-        identifier: `ID${timestamp}-012`,
+        identifier: generateIdentifier(12, false), // Passport
         country: "Saudi Arabia",
         ethnicity: "Middle Eastern",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -186,7 +224,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Andersen",
         gender: "male",
         birthDate: 19860912,
-        identifier: `ID${timestamp}-013`,
+        identifier: generateIdentifier(13, true), // Turkish ID
         country: "Denmark",
         ethnicity: "Scandinavian",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -208,7 +246,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Nkrumah",
         gender: "female",
         birthDate: 19920330,
-        identifier: `ID${timestamp}-014`,
+        identifier: generateIdentifier(14, false), // Passport
         country: "Ghana",
         ethnicity: "African",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -218,7 +256,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Silva",
         gender: "male",
         birthDate: 19970618,
-        identifier: `ID${timestamp}-015`,
+        identifier: generateIdentifier(15, true), // Turkish ID
         country: "Brazil",
         ethnicity: "Latino",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -235,7 +273,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Wong",
         gender: "female",
         birthDate: 19990824,
-        identifier: `ID${timestamp}-016`,
+        identifier: generateIdentifier(16, false), // Passport
         country: "Singapore",
         ethnicity: "Asian",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -245,7 +283,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Mueller",
         gender: "male",
         birthDate: 19831117,
-        identifier: `ID${timestamp}-017`,
+        identifier: generateIdentifier(17, true), // Turkish ID
         country: "Germany",
         ethnicity: "Caucasian",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -262,7 +300,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Okafor",
         gender: "female",
         birthDate: 19960502,
-        identifier: `ID${timestamp}-018`,
+        identifier: generateIdentifier(18, false), // Passport
         country: "Nigeria",
         ethnicity: "African",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -272,7 +310,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Novak",
         gender: "male",
         birthDate: 19910908,
-        identifier: `ID${timestamp}-019`,
+        identifier: generateIdentifier(19, true), // Turkish ID
         country: "Czech Republic",
         ethnicity: "Slavic",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -289,7 +327,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Patel",
         gender: "other",
         birthDate: 20000115,
-        identifier: `ID${timestamp}-020`,
+        identifier: generateIdentifier(20, false), // Passport
         country: "India",
         ethnicity: "South Asian",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -299,7 +337,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Dubois",
         gender: "male",
         birthDate: 19781203,
-        identifier: `ID${timestamp}-021`,
+        identifier: generateIdentifier(21, true), // Turkish ID
         country: "France",
         ethnicity: "Caucasian",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -321,7 +359,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Kowalski",
         gender: "female",
         birthDate: 19930521,
-        identifier: `ID${timestamp}-022`,
+        identifier: generateIdentifier(22, false), // Passport
         country: "Poland",
         ethnicity: "Slavic",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -331,7 +369,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Mitchell",
         gender: "male",
         birthDate: 19880416,
-        identifier: `ID${timestamp}-023`,
+        identifier: generateIdentifier(23, true), // Turkish ID
         country: "Australia",
         ethnicity: "Caucasian",
         documentState: { isCanceled: true, cancelledAt: null },
@@ -348,7 +386,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Khan",
         gender: "female",
         birthDate: 19950809,
-        identifier: `ID${timestamp}-024`,
+        identifier: generateIdentifier(24, false), // Passport
         country: "Pakistan",
         ethnicity: "South Asian",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -358,7 +396,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Rodriguez",
         gender: "male",
         birthDate: 19840322,
-        identifier: `ID${timestamp}-025`,
+        identifier: generateIdentifier(25, true), // Turkish ID
         country: "Mexico",
         ethnicity: "Latino",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -375,7 +413,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Svensson",
         gender: "female",
         birthDate: 19981014,
-        identifier: `ID${timestamp}-026`,
+        identifier: generateIdentifier(26, false), // Passport
         country: "Sweden",
         ethnicity: "Scandinavian",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -385,7 +423,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Mensah",
         gender: "male",
         birthDate: 19870728,
-        identifier: `ID${timestamp}-027`,
+        identifier: generateIdentifier(27, true), // Turkish ID
         country: "Ghana",
         ethnicity: "African",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -402,7 +440,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Fernandez",
         gender: "female",
         birthDate: 19940627,
-        identifier: `ID${timestamp}-028`,
+        identifier: generateIdentifier(28, false), // Passport
         country: "Argentina",
         ethnicity: "Latino",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -412,7 +450,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Singh",
         gender: "male",
         birthDate: 19891111,
-        identifier: `ID${timestamp}-029`,
+        identifier: generateIdentifier(29, true), // Turkish ID
         country: "India",
         ethnicity: "South Asian",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -434,7 +472,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Thompson",
         gender: "female",
         birthDate: 20010305,
-        identifier: `ID${timestamp}-030`,
+        identifier: generateIdentifier(30, false), // Passport
         country: "New Zealand",
         ethnicity: "Caucasian",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -444,7 +482,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Farah",
         gender: "male",
         birthDate: 19930918,
-        identifier: `ID${timestamp}-031`,
+        identifier: generateIdentifier(31, true), // Turkish ID
         country: "Somalia",
         ethnicity: "African",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -454,7 +492,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Yamamoto",
         gender: "female",
         birthDate: 19960201,
-        identifier: `ID${timestamp}-032`,
+        identifier: generateIdentifier(32, false), // Passport
         country: "Japan",
         ethnicity: "Asian",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -471,7 +509,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Morales",
         gender: "male",
         birthDate: 19850804,
-        identifier: `ID${timestamp}-033`,
+        identifier: generateIdentifier(33, true), // Turkish ID
         country: "Chile",
         ethnicity: "Latino",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -481,7 +519,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Petrov",
         gender: "female",
         birthDate: 19920512,
-        identifier: `ID${timestamp}-034`,
+        identifier: generateIdentifier(34, false), // Passport
         country: "Ukraine",
         ethnicity: "Slavic",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -498,7 +536,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Park",
         gender: "other",
         birthDate: 19990923,
-        identifier: `ID${timestamp}-035`,
+        identifier: generateIdentifier(35, true), // Turkish ID
         country: "South Korea",
         ethnicity: "Asian",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -508,7 +546,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Virtanen",
         gender: "male",
         birthDate: 19880719,
-        identifier: `ID${timestamp}-036`,
+        identifier: generateIdentifier(36, false), // Passport
         country: "Finland",
         ethnicity: "Scandinavian",
         documentState: { isCanceled: true, cancelledAt: null },
@@ -525,7 +563,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Hosseini",
         gender: "female",
         birthDate: 19941026,
-        identifier: `ID${timestamp}-037`,
+        identifier: generateIdentifier(37, true), // Turkish ID
         country: "Iran",
         ethnicity: "Middle Eastern",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -535,7 +573,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Brown",
         gender: "male",
         birthDate: 19810613,
-        identifier: `ID${timestamp}-038`,
+        identifier: generateIdentifier(38, false), // Passport
         country: "USA",
         ethnicity: "African American",
         documentState: { isCanceled: false, cancelledAt: null },
@@ -557,7 +595,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Dlamini",
         gender: "male",
         birthDate: 19900430,
-        identifier: `ID${timestamp}-039`,
+        identifier: generateIdentifier(39, true), // Turkish ID
         country: "South Africa",
         ethnicity: "African",
         documentState: { isCanceled: false, cancelledAt: null }
@@ -567,7 +605,7 @@ const mockPatients: CreatePatient[] = [
         surname: "Popescu",
         gender: "female",
         birthDate: 19970215,
-        identifier: `ID${timestamp}-040`,
+        identifier: generateIdentifier(40, false), // Passport
         country: "Romania",
         ethnicity: "Caucasian",
         documentState: { isCanceled: false, cancelledAt: null },

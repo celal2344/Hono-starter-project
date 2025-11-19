@@ -8,6 +8,7 @@ interface SignUpPayload {
   image: string;
   callbackURL: string;
   rememberMe: boolean;
+  role: 'nurse' | 'doctor';
 }
 
 const NURSE_USER: SignUpPayload = {
@@ -17,6 +18,7 @@ const NURSE_USER: SignUpPayload = {
   image: '',
   callbackURL: '',
   rememberMe: true,
+  role: 'nurse',
 };
 
 const DOCTOR_USER: SignUpPayload = {
@@ -26,6 +28,7 @@ const DOCTOR_USER: SignUpPayload = {
   image: '',
   callbackURL: '',
   rememberMe: true,
+  role: 'doctor',
 };
 
 async function waitForServer(maxAttempts = 30, delayMs = 1000): Promise<boolean> {
