@@ -16,8 +16,10 @@ function RootComponent() {
   
   return (
     <>
+    <div className="isolate">
       {!isAuthPage && <Header />}
       <Outlet />
+      </div>
     </>
   )
 }

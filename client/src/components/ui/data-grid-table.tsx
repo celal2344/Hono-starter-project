@@ -1,8 +1,10 @@
+"use no memo" 
+
 import * as React from 'react';
-import { type CSSProperties, Fragment, type ReactNode, useMemo } from 'react';
+import { CSSProperties, Fragment, ReactNode, useMemo } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useDataGrid } from '@/components/ui/data-grid';
-import { type Cell, type Column, flexRender, type Header, type HeaderGroup, type Row } from '@tanstack/react-table';
+import { Cell, Column, flexRender, Header, HeaderGroup, Row } from '@tanstack/react-table';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
@@ -30,7 +32,7 @@ const bodyCellSpacingVariants = cva('', {
   },
 });
 
-function getPinningStyles<TData>(column: Column<TData>, isHeader: boolean = false): CSSProperties {
+function getPinningStyles<TData>(column: Column<TData>): CSSProperties {
   const isPinned = column.getIsPinned();
 
   return {
@@ -38,13 +40,13 @@ function getPinningStyles<TData>(column: Column<TData>, isHeader: boolean = fals
     right: isPinned === 'right' ? `${column.getAfter('right')}px` : undefined,
     position: isPinned ? 'sticky' : 'relative',
     width: column.getSize(),
-    zIndex: isPinned ? (isHeader ? 2 : 1) : 0,
+    zIndex: isPinned ? 1 : 0,
   };
 }
 
 function DataGridTableBase({ children }: { children: ReactNode }) {
   const { props } = useDataGrid();
-
+  
   return (
     <table
       data-slot="data-grid-table"
@@ -112,6 +114,7 @@ function DataGridTableHeadRowCell<TData>({
   dndRef?: React.Ref<HTMLTableCellElement>;
   dndStyle?: CSSProperties;
 }) {
+  
   const { props } = useDataGrid();
 
   const { column } = header;
@@ -130,7 +133,7 @@ function DataGridTableHeadRowCell<TData>({
         ...(props.tableLayout?.width === 'fixed' && {
           width: `${header.getSize()}px`,
         }),
-        ...(props.tableLayout?.columnsPinnable && column.getCanPin() && getPinningStyles(column, true)),
+        ...(props.tableLayout?.columnsPinnable && column.getCanPin() && getPinningStyles(column)),
         ...(dndStyle ? dndStyle : null),
       }}
       data-pinned={isPinned || undefined}
@@ -415,19 +418,6 @@ function DataGridTable<TData>() {
   const { table, isLoading, props } = useDataGrid();
   const pagination = table.getState().pagination;
   
-  // Extract rows at render time to ensure React tracks this dependency
-  const rawRows = table.getRowModel().rows;
-  
-  // Create stable references that React can track for re-renders
-  // This ensures the component re-renders when pagination or data changes
-  const rows = useMemo(() => rawRows, [
-    rawRows.length,
-    pagination.pageIndex,
-    pagination.pageSize,
-    // Include row IDs to detect when data content changes (not just length)
-    rawRows.map((row: Row<TData>) => row.id).join(','),
-  ]);
-  
   return (
     <DataGridTableBase>
       <DataGridTableHead>
@@ -489,9 +479,9 @@ function DataGridTable<TData>() {
               </div>
             </td>
           </tr>
-        ) : !isLoading && rows.length ? (
-          // Only show actual data when not loading - prevents showing cached data during refetches
-          rows.map((row: Row<TData>, index) => {
+        ) : table.getRowModel().rows.length ? (
+          // Show actual data when not loading
+          table.getRowModel().rows.map((row: Row<TData>, index) => {
             return (
               <Fragment key={row.id}>
                 <DataGridTableBodyRow row={row} key={index}>

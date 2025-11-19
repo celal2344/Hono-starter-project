@@ -100,6 +100,7 @@ export function AddPatientModal({ open, onOpenChange }: AddPatientModalProps) {
 
   const form = useForm<FormData>({
     resolver: zodResolver(fullFormSchema),
+    mode: 'onChange', // Show errors as user types/interacts
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -123,7 +124,9 @@ export function AddPatientModal({ open, onOpenChange }: AddPatientModalProps) {
       const month = String(birthDate.getMonth() + 1).padStart(2, '0');
       const day = String(birthDate.getDate()).padStart(2, '0');
       const numericDate = parseInt(`${year}${month}${day}`);
-      form.setValue('birthdate', numericDate);
+      form.setValue('birthdate', numericDate, { shouldValidate: true });
+    } else {
+      form.setValue('birthdate', 0, { shouldValidate: true });
     }
   }, [birthDate, form]);
 
@@ -335,7 +338,7 @@ export function AddPatientModal({ open, onOpenChange }: AddPatientModalProps) {
                       Add Companion
                     </Button>
                   </div>
-
+                  <div className="flex flex-col gap-2 overflow-y-auto max-h-128">
                   {fields.length === 0 && (
                     <p className="text-sm text-muted-foreground">No companions added. Click "Add Companion" to add one.</p>
                   )}
@@ -395,6 +398,7 @@ export function AddPatientModal({ open, onOpenChange }: AddPatientModalProps) {
                       />
                     </div>
                   ))}
+                  </div>
                 </div>
               )}
             </form>
@@ -421,6 +425,7 @@ export function AddPatientModal({ open, onOpenChange }: AddPatientModalProps) {
               ) : (
                 <Button
                   type="submit"
+                  form="patient-form"
                   disabled={createPatientMutation.isPending}
                 >
                   {createPatientMutation.isPending ? 'Adding...' : 'Add Patient'}

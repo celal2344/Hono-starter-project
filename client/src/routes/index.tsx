@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import DataGridDemo from '@/features/patient/components/crud'
 import { authClient } from '@/lib/auth-client'
+import PatientsDataGrid from '@/features/patient/components/patients-data-grid'
 
 export const Route = createFileRoute('/')({
   beforeLoad: async ({ location }) => {
@@ -30,8 +30,8 @@ function App() {
           <h2 className="text-2xl font-bold text-gray-900">Patient Management</h2>
           <p className="text-sm text-gray-600 mt-1">View and manage patient records</p>
         </div>
-        
-        <DataGridDemo />
+        <PatientsDataGrid />
+
       </div>
     </div>
   )
