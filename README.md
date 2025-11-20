@@ -1,4 +1,4 @@
-test users:
+Test users:
 
 NURSE:
   email: 'testn@test.com',
@@ -12,7 +12,7 @@ DOCTOR
 access api docs from:
 http://localhost:8081/docs
 
-setup:
+Setup:
 
 docker compose up -d --build
 
